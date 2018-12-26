@@ -2,7 +2,10 @@ package com.mobiquityinc.packer;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Package
 {
@@ -95,5 +98,49 @@ public class Package
             .append("maxNumberOfItems", maxNumberOfItems)
             .append("things", things)
             .toString();
+    }
+
+    public List<Thing> determineCostAndWeightWisePackage() {
+        things.removeIf(t-> t.getWeight()>maxWeight);
+
+        ArrayList<ArrayList<Thing>> packageCombinations = new ArrayList<ArrayList<Thing>>();
+        for(int i = 0; i < things.size(); i++) {
+            Thing currentItem = things.get(i);
+            int combinationSize = packageCombinations.size();
+            for (int j = 0; j < combinationSize; j++) {
+                ArrayList<Thing> combination = packageCombinations.get(j);
+                ArrayList<Thing> newCombination = new ArrayList<>(combination);
+                newCombination.add(currentItem);
+                packageCombinations.add(newCombination);
+            }
+            ArrayList<Thing> current = new ArrayList<Thing>();
+            current.add(currentItem);
+            packageCombinations.add(current);
+        }
+
+        ArrayList<Thing> bestCombination = new ArrayList<>();
+        double bestCost = 0;
+        double bestWeight = 100; //max weight is 100
+        for(ArrayList<Thing> combination : packageCombinations){
+            double combinationWeight = combination.stream().filter(thing -> thing !=null).mapToDouble(Thing::getWeight).sum();
+            if(combinationWeight > maxWeight){
+                continue;
+            }else{
+                double combinationPrice = combination.stream().filter(thing -> thing !=null).mapToDouble(Thing::getCost).sum();
+                if(combinationPrice > bestCost){
+                    bestCost = combinationPrice;
+                    bestCombination = combination;
+                    bestWeight = combinationWeight;
+                }else if(combinationPrice == bestCost){	//use lightest weight
+                    if(combinationWeight < bestWeight){
+                        bestCost = combinationPrice;
+                        bestCombination = combination;
+                        bestWeight = combinationWeight;
+                    }
+                }
+            }
+        }
+
+        return bestCombination;
     }
 }

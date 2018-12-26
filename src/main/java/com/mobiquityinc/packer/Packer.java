@@ -5,11 +5,13 @@ import com.mobiquityinc.packer.exception.APIException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Packer
 {
     public static String pack(String filePath) throws APIException, IOException
     {
+        String result = "";
         File file = new File(filePath);
         BufferedReader in = new BufferedReader(new FileReader(file));
         String line;
@@ -28,13 +30,22 @@ public class Packer
                 Thing thing = new Thing(id, weight, price);
                 inputs.add(thing);
             }
-            //Collections.sort(inputs);
+
             Package aPackage = new Package(weightLimit, inputs);
             System.out.println(aPackage.toString());
+            List<Thing> bestCombo = aPackage.determineCostAndWeightWisePackage();
+            if(bestCombo.size() == 0){
+                result+="-\n";
+            }else{
+                result+=bestCombo.stream().map(t->t.getIndexNumber()).collect(Collectors.toList()).toString()+"\n";
+            }
+
         }
 
-        return "";
+        return result;
     }
+
+
 
     public static void main(String[] args) throws APIException, IOException
     {
