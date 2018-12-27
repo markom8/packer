@@ -3,9 +3,7 @@ package com.mobiquityinc.packer;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Package
 {
@@ -13,6 +11,7 @@ public class Package
     double maxCost;
     int maxNumberOfItems;
     List<Thing> things;
+
 
     public Package(List<Thing> things)
     {
@@ -100,14 +99,18 @@ public class Package
             .toString();
     }
 
-    public List<Thing> determineCostAndWeightWisePackage() {
-        things.removeIf(t-> t.getWeight()>maxWeight);
+
+    public List<Thing> determineCostAndWeightWisePackage()
+    {
+        things.removeIf(t -> t.getWeight() > maxWeight);
 
         ArrayList<ArrayList<Thing>> packageCombinations = new ArrayList<ArrayList<Thing>>();
-        for(int i = 0; i < things.size(); i++) {
+        for (int i = 0; i < things.size(); i++)
+        {
             Thing currentItem = things.get(i);
             int combinationSize = packageCombinations.size();
-            for (int j = 0; j < combinationSize; j++) {
+            for (int j = 0; j < combinationSize; j++)
+            {
                 ArrayList<Thing> combination = packageCombinations.get(j);
                 ArrayList<Thing> newCombination = new ArrayList<>(combination);
                 newCombination.add(currentItem);
@@ -120,19 +123,27 @@ public class Package
 
         ArrayList<Thing> bestCombination = new ArrayList<>();
         double bestCost = 0;
-        double bestWeight = 100; //max weight is 100
-        for(ArrayList<Thing> combination : packageCombinations){
-            double combinationWeight = combination.stream().filter(thing -> thing !=null).mapToDouble(Thing::getWeight).sum();
-            if(combinationWeight > maxWeight){
+        double bestWeight = 100;
+        for (ArrayList<Thing> combination : packageCombinations)
+        {
+            double combinationWeight = combination.stream().filter(thing -> thing != null).mapToDouble(Thing::getWeight).sum();
+            if (combinationWeight > maxWeight)
+            {
                 continue;
-            }else{
-                double combinationPrice = combination.stream().filter(thing -> thing !=null).mapToDouble(Thing::getCost).sum();
-                if(combinationPrice > bestCost){
+            }
+            else
+            {
+                double combinationPrice = combination.stream().filter(thing -> thing != null).mapToDouble(Thing::getCost).sum();
+                if (combinationPrice > bestCost)
+                {
                     bestCost = combinationPrice;
                     bestCombination = combination;
                     bestWeight = combinationWeight;
-                }else if(combinationPrice == bestCost){	//use lightest weight
-                    if(combinationWeight < bestWeight){
+                }
+                else if (combinationPrice == bestCost)
+                {
+                    if (combinationWeight < bestWeight)
+                    {
                         bestCost = combinationPrice;
                         bestCombination = combination;
                         bestWeight = combinationWeight;
